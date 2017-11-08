@@ -1,0 +1,119 @@
+/* Movie (movie id, movie title, description) */
+CREATE TABLE Movie
+	(
+		mID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		movTitle VARCHAR(30),
+		movDescrip VARCHAR(500)
+	);
+
+
+/* Reviews (movie title, text, rating out of 5 stars, user id) */
+CREATE TABLE Review
+   	( 
+   		movTitle VARCHAR(30) REFERENCES MOVIE(movTitle),
+   	  	uID INT REFERENCES User(UID),
+   	  	rating INT NOT NULL,
+   	  	review VARCHAR(500),
+   	  	CHECK(rating<5),
+   	  	PRIMARY KEY (movTitle, uID)
+   	);
+
+/* User (user id, user name, phone number, e-mail address, rewards number) */
+CREATE TABLE User
+	( 
+		uID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	  	username VARCHAR(15) UNIQUE,
+	  	phoneNumber INT,
+	  	email VARCHAR(20),
+	  	rewardsNumber VARCHAR(20) UNIQUE
+	);
+
+/* Show (show id, movie title, seats available, seats full, array of seats, theater location) */
+CREATE TABLE Shows
+	(
+ 		sID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+ 	  	movTitle VARCHAR(30) REFERENCES MOVIE(movTitle),
+ 	  	seatsAvail INT,
+ 	  	seatsFull INT,
+ 	  	time DATETIME,
+ 	  	tNum INT REFERENCES THEATER(tNum)
+	);
+
+/* Theater (theater number, number of seats) */
+CREATE TABLE Theater
+ 	( 
+	 	tNum INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	 	numSeats INT NOT NULL
+ 	);
+
+/* Reservation (user id, seats reserved, show id, movie title) */
+CREATE TABLE Reservation
+ 	( 
+ 		resNum INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+		uID INT REFERENCES User(UID),
+		seatNumsRes INT,
+		time DATETIME REFERENCES Shows(time),
+		movTitle VARCHAR(30) REFERENCES MOVIE(movTitle)
+	);
+
+/* Add Test Movie */
+INSERT INTO Movie(movTitle,movDescrip) VALUES ('Test Movie', 'This is a test movie');
+
+/* Add Test User */
+INSERT INTO User(username,phoneNumber,email) VALUES ('testUser','1111111111','test@test.com');
+
+/* Add Test Theater */
+INSERT INTO Theater(numSeats) VALUES (50);
+
+/* Add Test Show */
+INSERT INTO Shows(movTitle,seatsAvail,seatsFull,time,tNum) VALUES ('Test Movie',50,0,'2017-01-01 12:00:00', 1);
+ 	 
+/* Users can reserve a specified seat in a theater for a movie at a certain time (this is defined as Show). */
+INSERT INTO Reservation(uID, seatNumsRes,time, movTitle) VALUES (1,1,'2017-01-01 12:00:00','Test Movie');
+
+/* Users can cancel a specified seat for a show. */
+UPDATE Shows SET seatsFull = 2 WHERE sID = 1;
+UPDATE Shows SET seatsAvail = 2 WHERE sID = 1;
+DELETE FROM Reservation WHERE  uID = 1;
+
+/* Users can modify a seat within a show */
+UPDATE Reservation SET seatNumsRes = 2 WHERE uID = 1;
+
+/* Users can search the database for a movie to find the times it is being played. */
+SELECT time FROM Shows  WHERE movTitle = 'Test Movie';
+
+/* Users can search for the movies that are playing for a certain time period (i.e., movies playing a certain week). */
+SELECT movTitle FROM Shows WHERE time = '2017-01-01 12:00:00';
+
+/* Users can obtain the movie review with the corresponding rating through search. */
+SELECT review FROM reviews WHERE rating = 5;
+
+/* Users can add reviews for a specified movie. */
+INSERT INTO Review(movTitle,uID,rating,review) VALUES ('Test Movie',1,5,'Test Review');
+
+/* Users can remove their review for a specified movie. */
+DELETE FROM Reviews WHERE uID = 1 AND movTitle='Test Movie';
+
+/* Users can sort movie reviews based on their rating. */
+SELECT * FROM Reviews SORT BY rating;
+
+/* Administrators can obtain information about seats for a specified show (for example, they can obtain seat capacity, and the list of users in that showing). */
+SELECT * FROM Shows INNER JOIN Reservation ON Shows.movTitle = Reservation.movTitle;
+
+/* Administrators can add new show times for a specified movie. */
+INSERT INTO Shows(movTitle,seatsAvail,seatsFull,time,tNum) VALUES ('Test Movie',50,0,'2017-01-01 12:00:00', 1);
+
+
+/* Administrators can add a movie, given they at least add one show. */
+INSERT INTO Movie(movTitle,movDescrip) VALUES ('Test Movie', 'This is a test movie');
+INSERT INTO Shows(movTitle,seatsAvail,seatsFull,time,tNum) VALUES ('Test Movie',50,0,'2017-01-01 12:00:00', 1);
+
+
+/* Administrators can obtain information about a user, specifically their name, phone number, and rewards number. */
+SELECT * FROM Users;
+
+/* Administrators can obtain reservation status for a show. */
+SELECT * FROM Reservation;
+
+15.   Administrators can obtain the statistics for a specified movie in a given time period.
+16.   Administrators can obtain the statistics for all movies in a given time period.
