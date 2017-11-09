@@ -6,8 +6,11 @@ public class sql{
 
 		try{
 			
-			Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/", "root", "");
-			System.out.println("Error");
+			Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/MovieScheduler", "root", "");
+			User u = new User(conn,"testUser");
+			u.viewReservation();
+			u.addReservation(1, "2017-01-01 12:30:00" , "Test Movie");
+			conn.close();
 		
 		}catch (SQLException se){
 
@@ -18,5 +21,4 @@ public class sql{
 
 
 	}
-
 }
