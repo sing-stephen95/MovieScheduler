@@ -106,8 +106,27 @@ public class User{
 
 	}
 
-	/* Users can cancel a specified seat for a show. */
+	/**
+	 * Users can cancel a specified seat for a show.
+	 * @param time Time of movie being deleted
+	 * @param movTitle Title of movie being deleted
+	 */
 	public void cancelReservation(String time, String movTitle){
+		
+		try {
+			
+			PreparedStatement viewRes = conn.prepareStatement("DELETE FROM Reservation WHERE uID = ? AND time = ? AND movTitle = ?");
+			viewRes.setInt(1, uID);
+			viewRes.setTimestamp(2, java.sql.Timestamp.valueOf(time));
+			viewRes.setString(3, movTitle);
+			viewRes.executeUpdate();
+			
+			
+			}catch(SQLException se) {
+				
+				System.out.println("cancel Reservation Error");
+				
+			};
 
 	}
 
