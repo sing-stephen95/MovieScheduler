@@ -1,3 +1,5 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CREATE TABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 /* Movie (movie id, movie title, description) */
 CREATE TABLE Movie
 	(
@@ -56,6 +58,10 @@ CREATE TABLE Reservation
 		movTitle VARCHAR(30) REFERENCES MOVIE(movTitle)
 	);
 
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END CREATE TABLES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INSERT TEST VALUES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 /* Add Test Movie */
 INSERT INTO Movie(movTitle,movDescrip) VALUES ('Test Movie', 'This is a test movie');
 
@@ -67,6 +73,10 @@ INSERT INTO Theater(numSeats) VALUES (50);
 
 /* Add Test Show */
 INSERT INTO Shows(movTitle,seatsAvail,seatsFull,time,tNum) VALUES ('Test Movie',50,0,'2017-01-01 12:00:00', 1);
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END INSERT TEST VALUES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SQL QUERIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
  	 
 /* Users can reserve a specified seat in a theater for a movie at a certain time (this is defined as Show). */
 INSERT INTO Reservation(uID, seatNumsRes,time, movTitle) VALUES (1,1,'2017-01-01 12:00:00','Test Movie');
@@ -117,3 +127,47 @@ SELECT * FROM Reservation;
 
 15.   Administrators can obtain the statistics for a specified movie in a given time period.
 16.   Administrators can obtain the statistics for all movies in a given time period.
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END SQL QUERIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TRIGGERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+DROP TRIGGER IF EXISTS updateShowOnAddReservation;
+delimiter //
+
+CREATE TRIGGER updateShowSeats
+AFTER INSERT ON Reservation
+FOR EACH ROW
+	BEGIN
+		UPDATE Shows SET seatsAvail = seatsAvail - new.seatNumsRes
+		WHERE movTitle = new.movTitle;
+        
+		UPDATE Shows SET seatsFull = seatsFull + new.seatNumsRes
+		WHERE movTitle = new.movTitle;
+
+    
+	END
+//
+delimiter ;
+
+
+DROP TRIGGER IF EXISTS updateShowOnDeleteReservation;
+delimiter //
+
+CREATE TRIGGER updateShowOnDeleteReservation
+AFTER DELETE ON Reservation
+FOR EACH ROW
+	BEGIN
+		UPDATE Shows SET seatsAvail = seatsAvail + old.seatNumsRes
+		WHERE movTitle = old.movTitle;
+        
+		UPDATE Shows SET seatsFull = seatsFull - old.seatNumsRes
+		WHERE movTitle = old.movTitle;
+
+    
+	END
+//
+delimiter ;
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END TRIGGERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
