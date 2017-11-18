@@ -176,8 +176,8 @@ public class User{
 			while(rs.next()){
 				
 		        //Retrieve by column name
-				Timestamp time = rs.getTimestamp("time");
-				//Display values
+			Timestamp time = rs.getTimestamp("time");
+			//Display values
 		        System.out.println("TIME: " + time);
 		        
 		      }
@@ -209,17 +209,17 @@ public class User{
 			while(rs.next()){
 				
 		        //Retrieve by column name
-				String movTitle = rs.getString("movTitle");
-				Timestamp time = rs.getTimestamp("time");
-				//Display values
-				System.out.println("TITLE: " + movTitle);
+			String movTitle = rs.getString("movTitle");
+			Timestamp time = rs.getTimestamp("time");
+			//Display values
+			System.out.println("TITLE: " + movTitle);
 		        System.out.println("TIME: " + time);
 		        
 		      }
 			
 		}catch(SQLException se) {
 				
-				System.out.println("View Showstimes During Time Error");
+			System.out.println("View Showstimes During Time Error");
 				
 		};
 	}
@@ -240,17 +240,17 @@ public class User{
 			while(rs.next()){
 				
 		        //Retrieve by column name
-				String movTitle = rs.getString("movTitle");
-				String review = rs.getString("review");
-				//Display values
-				System.out.println("TITLE: " + movTitle);
+			String movTitle = rs.getString("movTitle");
+			String review = rs.getString("review");
+			//Display values
+			System.out.println("TITLE: " + movTitle);
 		        System.out.println("REVIEW: " + review);
 		        
 		      }
 			
 		}catch(SQLException se) {
 				
-				System.out.println("View Rating Review Error");
+			System.out.println("View Rating Review Error");
 				
 		};
 	}
@@ -303,6 +303,261 @@ public class User{
 			};
 
 	}
+	
+	
+	/* Users can sort movie reviews based on their rating */
+	public void sortReview(String movTitle) {
+	
+		
+	}
+	
+	/**
+	 * Determine whether the user is administrator
+	 * @param uID Identification of user being determined
+	 */
+	public boolean isAdmin() {
+		
+		int admin = 0;
+		
+		try {			
+			
+			String sql = "SELECT admin FROM User WHERE uID = ?";
+			PreparedStatement isAd = conn.prepareStatement(sql);
+			isAd.setInt(1, uID);
+			ResultSet rs = isAd.executeQuery();
+			admin = rs.getInt("admin");
+				
+			
+		}catch(SQLException se) {
+			
+			System.out.println("Admin Authorization Error");
+		
+		};
+		
+		if(admin == 1) return true;
+		else return false;
+	}
+	
+	/**
+	 * Administrators can obtain information about seats for a specified show
+	 * (for example, they can obtain seat capacity, and the list of users in that showing). 
+	 * 
+	 */
+	public void showInfo() {
+		
+		if (isAdmin()){
+			
+			try {
+				
+				String sql = "SELECT * FROM Shows INNER JOIN Reservation ON Shows.movTitle = Reservation.movTitle";
+				Statement showInfo = conn.createStatement();
+				ResultSet rs = showInfo.executeQuery(sql);
+				
+				while(rs.next()){
+					
+			        //Retrieve by column name
+				String movTitle = rs.getString("movTitle");
+				int seatsAvail = rs.getInt("seatsAvail");
+				int tNum = rs.getInt("tNum");
+				int sID = rs.getInt("sID");
+				Timestamp time = rs.getTimestamp("time");
+				int uID = rs.getInt("uID");
+				int seatNumsRes = rs.getInt("seatNumsRes");
+				//Display values
+				System.out.println("TITLE: " + movTitle);
+			        System.out.println("SEATS AVAILABLE: " + seatsAvail);
+			        System.out.println("THEATER NUMBER : " + tNum);
+			        System.out.println("SID: " + sID);
+			        System.out.println("TIME: " + time);
+			        System.out.println("UID: " + uID);
+			        System.out.println("SEATS RESERVED: " + seatNumsRes);
+			        
+			      }
+				
+				
+			}catch(SQLException se) {
+				
+				System.out.println("Show Info Error");
+				
+			};
+		}
+	}
+	
+	
+	/**
+	 * Administrators can add new show times for a specified movie
+	 * @param movTitle Title of movie being added
+	 * @param time Show time of movie being added
+	 * @param tNum Theater number of movie being added
+	 */
+	public void addShowtimes(String movTitle, String time, int tNum) {
+		
+		if (isAdmin()){
+			
+			try {
+				
+				String sql = "INSERT INTO Show(movTitle, seatsAvail, seatsFull, time, tNum) VALUES(?,(SELECT numSeats FROM Theater WHERE tNum = ?),0,?,?)";
+				PreparedStatement addShow = conn.prepareStatement(sql);
+				addShow.setString(1, movTitle);
+				addShow.setInt(2, tNum);
+				addShow.setTimestamp(3, java.sql.Timestamp.valueOf(time));
+				addShow.setInt(4, tNum);
+				addShow.executeUpdate();
+				
+			}catch(SQLException se) {
+				
+				System.out.println("Add Showtimes Error");
+				
+			};
+		}
+	}
+	
+	/**
+	 * Administrators can add a movie, given they at least add one show.
+	 * @param movTitle Title of movie being added
+	 * @param movDescrip Description of movie being added
+	 * @param time Show time of movie being added
+	 * @param tNum Theater number of movie being added
+	 */
+	public void addMovie(String movTitle, String movDescrip, String time, int tNum) {
+		
+		if (isAdmin()){
+			
+			try {
+				
+				String sql = "INSERT INTO Movie(movTitle, movDescrip) VALUES(?, ?)";
+				PreparedStatement addMov = conn.prepareStatement(sql);
+				addMov.setString(1, movTitle);
+				addMov.setString(2, movDescrip);
+				addMov.executeUpdate();
+				addShowtimes(movTitle, time, tNum);
+				
+			}catch(SQLException se) {
+				
+				System.out.println("Add Movie Error");
+				
+			};
+		}
+	}
 
+	
+	/**
+	 * Administrators can obtain information about a user, specifically
+	 * their name, phone number, and rewards number
+	 * @param uID Identification of a user being searched
+	 */
+	public void userInfo(int uID) {
+		
+		if (isAdmin()){
+			
+			try {
+				
+				String sql = "SELECT * FROM User WHERE uID = ?";
+				PreparedStatement userInfo = conn.prepareStatement(sql);
+				userInfo.setInt(1, uID);
+				ResultSet rs = userInfo.executeQuery();
+				
+				while(rs.next()){
+					
+			        //Retrieve by column name
+				String username = rs.getString("username");
+				int phoneNumber = rs.getInt("phoneNumber");
+				String email = rs.getString("email");
+				String rewardsNumber = rs.getString("rewardsNumber");
+				//Display values
+				System.out.println("USERNAME: " + username);
+			        System.out.println("PHONE NUMBER: " + phoneNumber);
+			        System.out.println("EMAIL : " + email);
+			        System.out.println("REWARDSNUMBER: " + rewardsNumber);
+			        
+				}
+				
+			}catch(SQLException se) {
+				
+				System.out.println("User Info Error");
+				
+			};
+		}
+	}
+	
+	/**
+	 * Administrators can obtain the statistics for a specified movie in a given time period.
+	 * @param movTitle Title of movie being searched
+	 * @param startTime Starting period of time being searched
+	 * @param endTime Ending period of time being searched
+	 */
+	public void statforMovDuringTime(String movTitle, String startTime, String endTime){
+		
+		if (isAdmin()){
+			
+			try {
+				
+				String sql = "SELECT mID, movTitle, movDescrip FROM Shows NATURAL JOIN Movie WHERE time > ? AND time < ? AND movTitle = ?";
+				PreparedStatement statMov = conn.prepareStatement(sql);
+				statMov.setTimestamp(1, java.sql.Timestamp.valueOf(startTime));
+				statMov.setTimestamp(2, java.sql.Timestamp.valueOf(endTime));
+				statMov.setString(3, movTitle);
+				ResultSet rs = statMov.executeQuery();
+				
+				while(rs.next()){
+					
+			        //Retrieve by column name
+				int mid = rs.getInt("mID");
+				String title = rs.getString("movTitle");
+				String descrip = rs.getString("movDescrip");
+				//Display values
+				System.out.println("MID: " + mid);
+				System.out.println("TITLE: " + title);
+			        System.out.println("TIME: " + descrip);
+			        
+			      }
+				
+			}catch(SQLException se) {
+					
+				System.out.println("Stat for Movie During Time Error");
+					
+			};
+		}
+	}
+	
+	
+	/**
+	 * Administrators can obtain the statistics for a specified movie in a given time period.
+	 * @param movTitle Title of movie being searched
+	 * @param startTime Starting period of time being searched
+	 * @param endTime Ending period of time being searched
+	 */
+	public void statforAllMovDuringTime(String startTime, String endTime){
+		
+		if (isAdmin()){
+			
+			try {
+				
+				String sql = "SELECT mID, movTitle, movDescrip FROM Shows NATURAL JOIN Movie WHERE time > ? AND time < ?";
+				PreparedStatement statAllMov = conn.prepareStatement(sql);
+				statAllMov.setTimestamp(1, java.sql.Timestamp.valueOf(startTime));
+				statAllMov.setTimestamp(2, java.sql.Timestamp.valueOf(endTime));
+				ResultSet rs = statAllMov.executeQuery();
+				
+				while(rs.next()){
+					
+			        //Retrieve by column name
+				int mid = rs.getInt("mID");
+				String title = rs.getString("movTitle");
+				String descrip = rs.getString("movDescrip");
+				//Display values
+				System.out.println("MID: " + mid);
+				System.out.println("TITLE: " + title);
+			        System.out.println("TIME: " + descrip);
+			        
+			      }
+				
+			}catch(SQLException se) {
+					
+				System.out.println("Stat for All Movie During Time Error");
+					
+			};
+		}
+	}
 	
 }
