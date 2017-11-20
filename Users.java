@@ -1,8 +1,8 @@
-package finalproject;
 
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class User{
 	
@@ -13,6 +13,7 @@ public class User{
 	String rewardsNumber;
 	Connection conn;
 	ResultSet rs;
+	boolean isAdmin;
 	
 	/**
 	 * Instantiates User class and sets variables to relevant information
@@ -35,6 +36,9 @@ public class User{
 			phoneNumber = rs.getInt("phoneNumber");
 			email = rs.getString("email");
 			rewardsNumber = rs.getString("rewardsNumber");
+			if(rs.getInt("admin") == 1) {
+				isAdmin = true;
+			}
 		}
 		
 		
@@ -44,13 +48,22 @@ public class User{
 			
 		};
 	}
+	
+	boolean isAdmin() {
+		if(isAdmin) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 
 	
 	/**
 	 *  Users can view their reservation within a show
 	 */
-	public void viewReservation(){
+	public ArrayList<String[]> viewReservation(){
 		
+		ArrayList<String[]> reservations = new ArrayList<String[]>();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		
 		try {
@@ -60,12 +73,14 @@ public class User{
 			rs = viewRes.executeQuery();
 			
 			while(rs.next()) {
+				String[] entry = new String[3];
 				int seatNumsRes = rs.getInt("seatNumsRes");
 				Date time = rs.getDate("time");
 				String movTitle = rs.getString("movTitle");
-				System.out.println("Movie: " + movTitle);
-				System.out.println("Showtime: " + dateFormat.format(time));
-				System.out.println("Seats Reserved: " + seatNumsRes);
+				entry[0] = movTitle;
+				entry[1] = dateFormat.format(time);
+				entry[2] = Integer.toString(seatNumsRes);
+				reservations.add(entry);
 			}
 			
 			
@@ -74,6 +89,8 @@ public class User{
 				System.out.println("view Reservation Error");
 				
 			};
+			
+		return reservations;
 		
 		
 
@@ -164,8 +181,10 @@ public class User{
 	 * Users can search the database for a movie to find the times it is being played.
 	 * @param movTitle Title of movie being searched
 	 */
-	public void viewShowtimesForMovie(String movTitle){
+	public ArrayList<Timestamp> viewShowtimesForMovie(String movTitle){
 
+		ArrayList<Timestamp> times = new ArrayList<Timestamp>();
+		
 		try {
 			
 			String sql = "SELECT time FROM Shows WHERE movTitle = ?";
@@ -176,17 +195,19 @@ public class User{
 			while(rs.next()){
 				
 		        //Retrieve by column name
-			Timestamp time = rs.getTimestamp("time");
-			//Display values
-		        System.out.println("TIME: " + time);
+				Timestamp time = rs.getTimestamp("time");
+				//Display values
+		        times.add(time);
 		        
-		      }
+			}
 			
 		}catch(SQLException se) {
 				
 				System.out.println("View Showtimes for Movie Error");
 				
 		};
+		
+		return times;
 		
 	}
 
@@ -196,7 +217,10 @@ public class User{
 	 * @param startTime Starting end of the time being searched
 	 * @param endTime Ending end of the time being searched
 	 */
-	public void viewMovieDuringTime(String startTime, String endTime){
+	public ArrayList<String[]> viewMovieDuringTime(String startTime, String endTime){
+		
+		ArrayList<String[]> showtime = new ArrayList<String[]>();
+		String[] show = new String[2];
 	
 		try {
 			
@@ -209,11 +233,12 @@ public class User{
 			while(rs.next()){
 				
 		        //Retrieve by column name
-			String movTitle = rs.getString("movTitle");
-			Timestamp time = rs.getTimestamp("time");
-			//Display values
-			System.out.println("TITLE: " + movTitle);
-		        System.out.println("TIME: " + time);
+				String movTitle = rs.getString("movTitle");
+				Timestamp time = rs.getTimestamp("time");
+				//String formattedDate = new SimpleDateFormat("yyyyMMdd").format(date);
+				//Display values
+				show[0] = movTitle;
+				//show[1] = time;
 		        
 		      }
 			
@@ -222,6 +247,8 @@ public class User{
 			System.out.println("View Showstimes During Time Error");
 				
 		};
+		
+		return showtime;
 	}
 
 	/**
@@ -310,34 +337,7 @@ public class User{
 	
 		
 	}
-	
-	/**
-	 * Determine whether the user is administrator
-	 * @param uID Identification of user being determined
-	 */
-	public boolean isAdmin() {
 		
-		int admin = 0;
-		
-		try {			
-			
-			String sql = "SELECT admin FROM User WHERE uID = ?";
-			PreparedStatement isAd = conn.prepareStatement(sql);
-			isAd.setInt(1, uID);
-			ResultSet rs = isAd.executeQuery();
-			admin = rs.getInt("admin");
-				
-			
-		}catch(SQLException se) {
-			
-			System.out.println("Admin Authorization Error");
-		
-		};
-		
-		if(admin == 1) return true;
-		else return false;
-	}
-	
 	/**
 	 * Administrators can obtain information about seats for a specified show
 	 * (for example, they can obtain seat capacity, and the list of users in that showing). 
@@ -345,7 +345,7 @@ public class User{
 	 */
 	public void showInfo() {
 		
-		if (isAdmin()){
+		if (isAdmin){
 			
 			try {
 				
@@ -392,7 +392,7 @@ public class User{
 	 */
 	public void addShowtimes(String movTitle, String time, int tNum) {
 		
-		if (isAdmin()){
+		if (isAdmin){
 			
 			try {
 				
@@ -421,7 +421,7 @@ public class User{
 	 */
 	public void addMovie(String movTitle, String movDescrip, String time, int tNum) {
 		
-		if (isAdmin()){
+		if (isAdmin){
 			
 			try {
 				
@@ -448,7 +448,7 @@ public class User{
 	 */
 	public void userInfo(int uID) {
 		
-		if (isAdmin()){
+		if (isAdmin){
 			
 			try {
 				
@@ -488,7 +488,7 @@ public class User{
 	 */
 	public void statforMovDuringTime(String movTitle, String startTime, String endTime){
 		
-		if (isAdmin()){
+		if (isAdmin){
 			
 			try {
 				
@@ -529,7 +529,7 @@ public class User{
 	 */
 	public void statforAllMovDuringTime(String startTime, String endTime){
 		
-		if (isAdmin()){
+		if (isAdmin){
 			
 			try {
 				

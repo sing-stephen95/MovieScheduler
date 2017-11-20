@@ -41,6 +41,18 @@ CREATE TABLE Shows
  	  	tNum INT REFERENCES THEATER(tNum)
 	);
 
+/* ArchivedShow (show id, movie title, seats available, seats full, array of seats, theater location) */
+CREATE TABLE archivedShows
+	(
+ 		sID INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+ 	  	movTitle VARCHAR(30) REFERENCES MOVIE(movTitle),
+ 	  	seatsAvail INT,
+ 	  	seatsFull INT,
+ 	  	time DATETIME,
+ 	  	tNum INT REFERENCES THEATER(tNum)
+	);
+
+
 /* Theater (theater number, number of seats) */
 CREATE TABLE Theater
  	( 
@@ -124,6 +136,13 @@ SELECT * FROM Users;
 
 /* Administrators can obtain reservation status for a show. */
 SELECT * FROM Reservation;
+
+/* Archives Shows into ArchivedShows Table when entry is greater than or equal 32 days past current date */
+START TRANSACTION;
+set @N := (now());
+INSERT INTO archivedShows select * from shows where time < date_sub(@N,INTERVAL 32 DAY);
+DELETE FROM shows WHERE time < date_sub(@N,INTERVAL 32 DAY);
+COMMIT;
 
 15.   Administrators can obtain the statistics for a specified movie in a given time period.
 16.   Administrators can obtain the statistics for all movies in a given time period.
