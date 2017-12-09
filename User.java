@@ -153,8 +153,8 @@ public class User{
 	/**
 	 * Users can modify a seat within a show.
 	 * @param seatNumRes Number of seats being reserved
-	 * @param time Time of movie being deleted
-	 * @param movTitle Title of movie being deleted
+	 * @param time Time of show being modified
+	 * @param movTitle Movie title of show being deleted
 	 */
 	public void modifyReservation(int seatNumsRes, String time, String movTitle){
 		
@@ -162,8 +162,8 @@ public class User{
 			
 			String sql = "UPDATE Reservation SET seatNumsRes = ? WHERE uID = ? AND time = ? AND movTitle = ?";
 			PreparedStatement modRes = conn.prepareStatement(sql);
-			modRes.setInt(1, uID);
-			modRes.setInt(2, seatNumsRes);
+			modRes.setInt(1, seatNumsRes);
+			modRes.setInt(2, uID);
 			modRes.setTimestamp(3, java.sql.Timestamp.valueOf(time));
 			modRes.setString(4, movTitle);
 			modRes.executeUpdate();
@@ -355,7 +355,8 @@ public class User{
 	
 	
 	/* Users can sort movie reviews based on their rating */
-	public void sortReview(String movTitle) {
+	public void sortReview(String movTitle) 
+	{
 	
 		
 	}
@@ -434,6 +435,14 @@ public class User{
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	public void addUser()
+	{
+		;
+	}
+
 	/**
 	 * Administrators can add a movie, given they at least add one show.
 	 * @param movTitle Title of movie being added
