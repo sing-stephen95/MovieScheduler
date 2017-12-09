@@ -69,8 +69,8 @@ public class UI {
 			insertUser.setString(1, username);
 			insertUser.setString(2, phoneNumber);
 			insertUser.setString(3, email);
-			insertUser.setInt(4, 2);
-			insertUser.setString(5, "1112");
+			insertUser.setInt(4, 1);
+			insertUser.setString(5, "1113");
 			insertUser.executeUpdate();
 			System.out.println("Success Account Created");
 			menu(username);
@@ -102,16 +102,16 @@ public class UI {
 			reservationMenu(username);
 			break;
 		case "2":
-			showtimeMenu();
+			showtimeMenu(username);
 			break;
 		case "3":
-			reviewMenu();
+			reviewMenu(username);
 			break;
 		case "4":
-			manageUsersMenu();
+			manageUsersMenu(username);
 			break;
 		case "5":
-			manageShowtimesMenu();
+			manageShowtimesMenu(username);
 			break;
 		case "6":
 			initialPrompt();
@@ -179,7 +179,7 @@ public class UI {
 	/**
 	 * 
 	 */
-	void showtimeMenu() {
+	void showtimeMenu(String username) {
 		
 	}
 	
@@ -189,28 +189,35 @@ public class UI {
 	 * 		Users can add reviews for a specified movie
 	 * 		Users can remove their review for a specified movie
 	 */
-	void reviewMenu() 
+	void reviewMenu(String username) 
 	{
 		System.out.println("Reviews were selected.\n Please select an option: ");
 		System.out.println("1. Obtain movie reviews with a corresponding rating.");
 		System.out.println("2. Add reviews for a specified movie.");
 		System.out.println("3. Remove a review you wrote.");
+		System.out.println("4. Back");
 		
 		String selection = sc.next();
 
 		switch(selection) {
 			case "1": 
 				getMovieReviewsBasedOnRating();
+				reviewMenu(username);
 				break;
 			case "2": 
 				addReviews();
+				reviewMenu(username);				
 				break;
 			case "3":
 				removeReviews();
+				reviewMenu(username);				
+				break;
+			case "4":
+				menu(username);
 				break;
 			default:
 				System.out.println("Incorrect response. Please insert a valid value in the menu:");
-				reviewMenu();
+				reviewMenu(username);
 		}
 	}
 	
@@ -220,23 +227,30 @@ public class UI {
 	 * 		Admins can add users
 	 * 		Admins can delete users
 	 */
-	void manageUsersMenu() {
+	void manageUsersMenu(String username) {
 		System.out.println("Managing users menu. \n Please select an option: ");
 		System.out.println("1. Obtain information about a user.");
 		System.out.println("2. Add a new user.");
 		System.out.println("3. Delete a user.");
+		System.out.println("4. Back");
 
 		String selection = sc.next();
 
 		switch(selection) {
 			case "1":
 				obtainUserInfo();
+				manageUsersMenu(username);
 				break;
 			case "2":
 				addNewUser();
+				manageUsersMenu(username);
 				break;
 			case "3":
 				deleteUser();
+				manageUsersMenu(username);
+				break;
+			case "4":
+				menu(username);
 				break;
 			default:
 				break;
@@ -248,20 +262,26 @@ public class UI {
 	 * 		Admins can add new show times for a specified movie
 	 * 		Admins can add a movie, given they add at least one show
 	 */
-	void manageShowtimesMenu()
+	void manageShowtimesMenu(String username)
 	{
 		System.out.println("Managing showtimes menu. \n Please select an option: ");
 		System.out.println("1. Add a new showtime for an existing movie.");
 		System.out.println("2. Add a new movie. At least one show for this movie must be added as well.");
+		System.out.println("3. Back");
 
 		String selection = sc.next();
 
 		switch(selection) {
 			case "1":
 				addShowtime();
+				manageShowtimesMenu(username);
 				break;
 			case "2":
 				addMovie();
+				manageShowtimesMenu(username);
+				break;
+			case "3":
+				menu(username);
 				break;
 			default:
 				break;
@@ -273,6 +293,8 @@ public class UI {
 		String movTitle, time;
 		int theaterNum;
 	
+		sc.nextLine();
+
 		System.out.println("What movie would you like to add a showtime for?");
 		movTitle = sc.nextLine();
 		System.out.println("What time will this show be?");
@@ -280,14 +302,16 @@ public class UI {
 		System.out.println("What theater will this show be in?");
 		theaterNum = sc.nextInt();
 
-		u.addShowtime(movTitle, time, theaterNum);
-		System.out.println("Successfully deleted your review.\n");
+		u.addShowtimes(movTitle, time, theaterNum);
+		System.out.println("Successfully added your showtime.\n");
 	}
 
 	void addMovie()
 	{
 		String movTitle, movDescrip, time;
 		int theaterNum;
+
+		sc.nextLine();
 
 		System.out.println("What is the title of the new movie?");
 		movTitle = sc.nextLine();
@@ -297,7 +321,8 @@ public class UI {
 		time = sc.nextLine();
 		System.out.println("What theater will this show be in?");
 		theaterNum = sc.nextInt();
-
+		sc.nextLine();
+		
 		u.addMovie(movTitle, movDescrip, time, theaterNum);
 		System.out.println("Successfully added a new movie with a new show.\n");
 	}
@@ -328,6 +353,8 @@ public class UI {
 
 		System.out.println("What rating do you give this movie (1-5)?");
 		movieRating = sc.nextInt();
+		sc.nextLine();
+
 		System.out.println("Please write your review, and then press enter when finished.");
 		movieReview = sc.nextLine();
 
@@ -352,14 +379,16 @@ public class UI {
 	{
 		String username;
 
+		sc.nextLine();
 		System.out.println("Enter the username of the user that you're interested in: ");
 		username = sc.nextLine();
 
-		//u.userInfo(username);
+		u.userInfo(username);
 	}
 
 	void addNewUser()
 	{
+		String username;
 
 	}
 

@@ -466,28 +466,27 @@ public class User{
 	/**
 	 * Administrators can obtain information about a user, specifically
 	 * their name, phone number, and rewards number
-	 * @param uID Identification of a user being searched
+	 * @param username Username of a user being searched
 	 */
-	public void userInfo(int uID) {
+	public void userInfo(String username) {
 		
 		if (isAdmin){
 			
 			try {
 				
-				String sql = "SELECT * FROM User WHERE uID = ?";
+				String sql = "SELECT * FROM User WHERE username = ?";
 				PreparedStatement userInfo = conn.prepareStatement(sql);
-				userInfo.setInt(1, uID);
+				userInfo.setString(1, username);
 				ResultSet rs = userInfo.executeQuery();
 				
 				while(rs.next()){
 					
 			        //Retrieve by column name
-				String username = rs.getString("username");
-				int phoneNumber = rs.getInt("phoneNumber");
-				String email = rs.getString("email");
-				String rewardsNumber = rs.getString("rewardsNumber");
-				//Display values
-				System.out.println("USERNAME: " + username);
+					int phoneNumber = rs.getInt("phoneNumber");
+					String email = rs.getString("email");
+					String rewardsNumber = rs.getString("rewardsNumber");
+					//Display values
+					System.out.println("USERNAME: " + username);
 			        System.out.println("PHONE NUMBER: " + phoneNumber);
 			        System.out.println("EMAIL : " + email);
 			        System.out.println("REWARDSNUMBER: " + rewardsNumber);
@@ -544,7 +543,7 @@ public class User{
 	
 	
 	/**
-	 * Administrators can obtain the statistics for a specified movie in a given time period.
+	 * Administrators can obtain the statistics for all movies in a given time period.
 	 * @param movTitle Title of movie being searched
 	 * @param startTime Starting period of time being searched
 	 * @param endTime Ending period of time being searched
