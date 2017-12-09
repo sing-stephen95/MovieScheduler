@@ -1,3 +1,4 @@
+package moviescheduler;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -40,8 +41,6 @@ public class User{
 				isAdmin = true;
 			}
 		}
-		
-		
 		}catch(SQLException se) {
 			
 			System.out.println("SQL Error");
@@ -282,6 +281,29 @@ public class User{
 		};
 	}
 
+	/**
+	 * Checks database to see if there is a review that corresponds to the given movie and user.
+	 * @param movTitle Title of movie to check
+	 */
+	public boolean checkReview(String movTitle) {
+		try {
+			String sql = "SELECT EXISTS(SELECT * FROM Review WHERE movTitle = ? and uID = ?";
+			PreparedStatement checkReview = conn.prepareStatement(sql);
+			checkReview.setString(1, movTitle);
+			checkReview.setInt(2, uID);
+			ResultSet rs = checkReview.executeQuery();
+
+			if(rs.next())
+			{
+				return true;
+			}
+			return false;
+
+		} catch(SQLException se) {
+			System.out.println("Check Review Error");
+		};
+		return false;
+	}
 	/**
 	 * Users can add reviews for a specified movie.
 	 * @param movTitle Title of movie being reviewed

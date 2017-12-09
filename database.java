@@ -1,3 +1,5 @@
+package moviescheduler;
+
 import java.sql.*;
 
 public class database {
