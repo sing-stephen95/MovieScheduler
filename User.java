@@ -353,7 +353,6 @@ public class User{
 
 	}
 	
-	
 	/**
 	 *  Users can view movies that have 4 stars or more average rating
 	 */
@@ -380,7 +379,34 @@ public class User{
 			
 			}catch(SQLException se) {
 				
-				System.out.println("Remove Review Error");
+				System.out.println("View Highest Rating Movies Error");
+				
+			};	
+	}
+	
+	/**
+	 *  Users can view all the movies have been played in the theater so far.
+	 */
+	public void viewAllMovies() {
+	
+		try {
+			
+			String sql = "SELECT DISTINCT movTitle FROM Shows UNION SELECT DISTINCT movTitle FROM archivedShows";
+			Statement allMovies = conn.createStatement();
+			ResultSet rs = allMovies.executeQuery(sql);
+			
+			while(rs.next()) {
+				
+				//Retrieve by column name
+				String movTitle = rs.getString("movTitle");
+				
+				//Display values
+				System.out.println("MOVIE: " + movTitle);
+			}
+			
+			}catch(SQLException se) {
+				
+				System.out.println("View All Movies Error");
 				
 			};	
 	}
