@@ -354,11 +354,35 @@ public class User{
 	}
 	
 	
-	/* Users can sort movie reviews based on their rating */
-	public void sortReview(String movTitle) 
-	{
+	/**
+	 *  Users can view movies that have 4 stars or more average rating
+	 */
+	public void viewHighRatingMovies() {
 	
-		
+		try {
+			
+			String sql = "SELECT * FROM Movie WHERE mID in (SELECT AVG(rating) as aStar, mID FROM Review"
+					+ "WHERE mID=Rating.mID group by mID having aStar>=4)";
+			Statement highRatingMovies = conn.createStatement();
+			ResultSet rs = highRatingMovies.executeQuery(sql);
+			
+			while(rs.next()) {
+				
+				//Retrieve by column name
+				String movTitle = rs.getString("movTitle");
+				String movDescrip = rs.getString("movDescrip");
+				
+				//Display values
+				System.out.println("MOVIE: " + movTitle);
+				System.out.println("Description: " + movDescrip);
+				System.out.println();
+			}
+			
+			}catch(SQLException se) {
+				
+				System.out.println("Remove Review Error");
+				
+			};	
 	}
 		
 	/**
