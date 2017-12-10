@@ -116,8 +116,8 @@ INSERT INTO Review(movTitle,uID,rating,review) VALUES ('Test Movie',1,5,'Test Re
 /* Users can remove their review for a specified movie. */
 DELETE FROM Reviews WHERE uID = 1 AND movTitle='Test Movie';
 
-/* Users can view movies that have 4 stars or more average rating. */
-SELECT * FROM Movie WHERE mID in (SELECT AVG(rating) as aStar, mID FROM Review WHERE mID=Rating.mID group by mID having aStar>=4);
+/* Users can view popular movies that 10 or more users have been reserved. */
+SELECT COUNT(uID), movTitle FROM Reservation GROUP BY movTitle HAVING COUNT(uID)>10 ORDER BY COUNT(uID) DESC;
 
 /* Users can view all the movies have been played in the theater so far. */
 SELECT DISTINCT movTitle FROM Shows UNION SELECT DISTINCT movTitle FROM archivedShows;
