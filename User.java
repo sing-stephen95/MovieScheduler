@@ -354,35 +354,31 @@ public class User{
 	}
 	
 	/**
-	 *  Users can view movies that have 4 stars or more average rating
+	 *  Users can view popular movies
 	 */
-	public void viewHighRatingMovies() {
+	public void viewPopularMovies() {
 	
 		try {
 			
-			String sql = "SELECT * FROM Movie WHERE mID in (SELECT AVG(rating) as aStar, mID FROM Review"
-					+ "WHERE mID=Rating.mID group by mID having aStar>=4)";
-			Statement highRatingMovies = conn.createStatement();
-			ResultSet rs = highRatingMovies.executeQuery(sql);
+			String sql = "SELECT COUNT(uID), movTitle FROM Reservation GROUP BY movTitle HAVING COUNT(uID)>10 ORDER BY COUNT(uID) DESC" ;
+			Statement popularMovies = conn.createStatement();
+			ResultSet rs = popularMovies.executeQuery(sql);
 			
 			while(rs.next()) {
 				
 				//Retrieve by column name
 				String movTitle = rs.getString("movTitle");
-				String movDescrip = rs.getString("movDescrip");
 				
 				//Display values
 				System.out.println("MOVIE: " + movTitle);
-				System.out.println("Description: " + movDescrip);
-				System.out.println();
 			}
 			
 			}catch(SQLException se) {
 				
-				System.out.println("View Highest Rating Movies Error");
+				System.out.println("View Popular Movies Error");
 				
 			};	
-	}
+	}	
 	
 	/**
 	 *  Users can view all the movies have been played in the theater so far.
