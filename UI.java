@@ -1,5 +1,3 @@
-
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -61,6 +59,7 @@ public class UI {
 		String phone = sc.next();
 		System.out.println("Please enter your email: ");
 		String email = sc.next();
+		System.out.println(username + phone + email);
 		createUser(username,phone,email);
 	}
 	
@@ -234,7 +233,8 @@ public class UI {
 		System.out.println("\nPlease select an option:");
 		System.out.println("1. Search the database for a movie to find what times it is being played.");
 		System.out.println("2. Search the database for movies playing during a certain time period.");
-		System.out.println("3. Back");
+		System.out.println("3. Search the database for movies with a high attendance.");
+		System.out.println("4. Exit");
 
 		String selection = sc.next();
 
@@ -248,6 +248,9 @@ public class UI {
 				showtimeMenu(username);
 				break;
 			case "3":
+				u.viewPopularMovies();
+				showtimeMenu(username);
+			case "4":
 				menu(username);
 		}
 	}
@@ -396,8 +399,7 @@ public class UI {
 		System.out.println("\nManaging users menu. \n Please select an option: ");
 		System.out.println("1. Obtain information about a user.");
 		System.out.println("2. Add a new user.");
-		System.out.println("3. Delete a user.");
-		System.out.println("4. Back");
+		System.out.println("3. Back");
 
 		String selection = sc.next();
 
@@ -411,10 +413,6 @@ public class UI {
 				manageUsersMenu(username);
 				break;
 			case "3":
-				deleteUser();
-				manageUsersMenu(username);
-				break;
-			case "4":
 				menu(username);
 				break;
 			default:
@@ -435,14 +433,10 @@ public class UI {
 
 	void addNewUser()
 	{
-		String username;
+		newAccount();
 
 	}
 
-	void deleteUser()
-	{
-
-	}
 
 	/****************************************
 		[ADMIN ONLY] SHOWTIME MGMT MENU 
@@ -457,7 +451,8 @@ public class UI {
 		System.out.println("\nManaging showtimes menu. \n Please select an option: ");
 		System.out.println("1. Add a new showtime for an existing movie.");
 		System.out.println("2. Add a new movie. At least one show for this movie must be added as well.");
-		System.out.println("3. Back");
+		System.out.println("3. See all movies including archived Movies");
+		System.out.println("4. Back");
 
 		String selection = sc.next();
 
@@ -471,6 +466,9 @@ public class UI {
 				manageShowtimesMenu(username);
 				break;
 			case "3":
+				u.viewAllMovies();
+				manageShowtimesMenu(username);
+			case "4":
 				menu(username);
 				break;
 			default:
