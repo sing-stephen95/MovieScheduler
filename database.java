@@ -1,4 +1,3 @@
-package moviescheduler;
 
 import java.sql.*;
 
